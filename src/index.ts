@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import EventSource from 'eventsource';
 import syncfetch from 'sync-fetch';
+import { App, Channel, Event } from './interfaces';
 
 /**
  * Represents a client for the EasyPush API.
@@ -44,7 +45,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as App;
     }
 
     /**
@@ -52,7 +53,7 @@ class EasyPushClient {
      * @param appId The ID of the app to retrieve.
      * @returns The retrieved app object.
      */
-    async getApp(appId: string) {
+    async getApp(appId: number) {
         const res = await fetch(`${this.endpoint}/apps/${appId}`, {
             method: 'GET',
             headers: this.defaultHeaders,
@@ -60,7 +61,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as App;
     }
 
     /**
@@ -69,7 +70,7 @@ class EasyPushClient {
      * @param name The new name of the app.
      * @returns The updated app object.
      */
-    async updateApp(appId: string, name: string) {
+    async updateApp(appId: number, name: string) {
         const res = await fetch(`${this.endpoint}/app/${appId}`, {
             method: 'PATCH',
             headers: this.defaultHeaders,
@@ -78,7 +79,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as App;
     }
 
     /**
@@ -86,7 +87,7 @@ class EasyPushClient {
      * @param appId The ID of the app to delete.
      * @returns The deleted app object.
      */
-    async deleteApp(appId: string) {
+    async deleteApp(appId: number) {
         const res = await fetch(`${this.endpoint}/app/${appId}`, {
             method: 'DELETE',
             headers: this.defaultHeaders,
@@ -103,7 +104,7 @@ class EasyPushClient {
      * @param name The name of the channel.
      * @returns The created channel object.
      */
-    async createChannel(appId: string, name: string) {
+    async createChannel(appId: number, name: string) {
         const res = await fetch(`${this.endpoint}/channel`, {
             method: 'POST',
             headers: this.defaultHeaders,
@@ -112,7 +113,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as Channel;
     }
 
     /**
@@ -120,7 +121,7 @@ class EasyPushClient {
      * @param channelId The ID of the channel to retrieve.
      * @returns The retrieved channel object.
      */
-    async getChannel(channelId: string) {
+    async getChannel(channelId: number) {
         const res = await fetch(`${this.endpoint}/channel/${channelId}`, {
             method: 'GET',
             headers: this.defaultHeaders,
@@ -128,7 +129,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as Channel;
     }
 
     /**
@@ -137,7 +138,7 @@ class EasyPushClient {
      * @param name The new name of the channel.
      * @returns The updated channel object.
      */
-    async updateChannel(channelId: string, name: string) {
+    async updateChannel(channelId: number, name: string) {
         const res = await fetch(`${this.endpoint}/channel/${channelId}`, {
             method: 'PUT',
             headers: this.defaultHeaders,
@@ -146,7 +147,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as Channel;
     }
 
     /**
@@ -154,7 +155,7 @@ class EasyPushClient {
      * @param channelId The ID of the channel to delete.
      * @returns The deleted channel object.
      */
-    async deleteChannel(channelId: string): Promise<any> {
+    async deleteChannel(channelId: number): Promise<any> {
         const res = await fetch(`${this.endpoint}/channel/${channelId}`, {
             method: 'DELETE',
             headers: this.defaultHeaders,
@@ -181,7 +182,7 @@ class EasyPushClient {
         if (res.status !== 200) {
             throw new Error(await res.text());
         }
-        return await res.json();
+        return await res.json() as Event | Channel;
     }
 
     /**
@@ -189,7 +190,7 @@ class EasyPushClient {
      * @param channel_id The ID of the channel to subscribe to.
      * @param callback The function to call when an event is received.
      */
-    async subscribeToChannel(channel_id: number, callback: (evt: MessageEvent<any>) => any) {
+    async subscribeToChannel(channel_id: number, callback: (evt: MessageEvent<Event>) => any) {
         const event = new EventSource(`${this.endpoint}/channel/${channel_id}/subscribe`, {
             withCredentials: true,
             headers: this.defaultHeaders,
