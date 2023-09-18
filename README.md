@@ -11,7 +11,7 @@ npm install --save @easy-push/ts-client
 ```javascript
 import EasyPushClient from '@easy-push/ts-client';
 
-const client = EasyPushClient("http://localhost:8080", "my-secret-key");
+const client = new EasyPushClient("https://easy-push-api.sayanbiswas.in", "meow", "uwu");
 const channel = client.getChannel(5);
 
 client.subscribeToChannel(5, (message) => {

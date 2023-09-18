@@ -3,32 +3,47 @@ import EventSource from 'eventsource';
 import syncfetch from 'sync-fetch';
 import { App, Channel, Event } from './interfaces';
 
+
+
 /**
  * Represents a client for the EasyPush API.
  */
 class EasyPushClient {
+    apiKey?: string;
     /**
      * Creates a new instance of the EasyPushClient class.
      * @param endpoint The endpoint URL for the EasyPush API.
-     * @param apiKey The API key to use for authentication.
+     * @param username The username to use for authentication.
+     * @param password The password to use for authentication.
      * @param defaultHeaders The default headers to include in requests.
      */
     constructor(
         private readonly endpoint: string,
-        private readonly apiKey: string,
-        private readonly defaultHeaders = {
+        private readonly username: string,
+        private readonly password: string,
+        private readonly defaultHeaders: any = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey
         }
     ) {
-        // Verify that the API key is valid by making a request to the API.
-        const res = syncfetch(`${endpoint}/user/getme`, {
-            method: 'GET',
-            headers: defaultHeaders,
+        // Authenticate the user and get the API key.
+        this.authenticate();
+    }
+
+    /**
+     * Authenticates the user and sets the API key.
+     */
+    private authenticate() {
+        const res = syncfetch(`${this.endpoint}/auth/signin`, {
+            method: 'POST',
+            headers: this.defaultHeaders,
+            body: JSON.stringify({ username: this.username, password: this.password }),
         });
-        if (res.status !== 200) {
-            throw new Error(res.text());
+        if (res.status !== 201) {
+            throw new Error(res.clone().text());
         }
+        const token = res.clone().text();
+        this.apiKey = token;
+        this.defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
     /**
@@ -42,10 +57,10 @@ class EasyPushClient {
             headers: this.defaultHeaders,
             body: JSON.stringify({ name }),
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as App;
+        return await res.clone().json() as App;
     }
 
     /**
@@ -59,9 +74,9 @@ class EasyPushClient {
             headers: this.defaultHeaders,
         });
         if (res.status !== 200) {
-            throw new Error(await res.text());
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as App;
+        return await res.clone().json() as App;
     }
 
     /**
@@ -77,9 +92,9 @@ class EasyPushClient {
             body: JSON.stringify({ name }),
         });
         if (res.status !== 200) {
-            throw new Error(await res.text());
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as App;
+        return await res.clone().json() as App;
     }
 
     /**
@@ -92,10 +107,10 @@ class EasyPushClient {
             method: 'DELETE',
             headers: this.defaultHeaders,
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return res.json();
+        return res.clone().json();
     }
 
     /**
@@ -110,10 +125,10 @@ class EasyPushClient {
             headers: this.defaultHeaders,
             body: JSON.stringify({ name, appId }),
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as Channel;
+        return await res.clone().json() as Channel;
     }
 
     /**
@@ -126,10 +141,10 @@ class EasyPushClient {
             method: 'GET',
             headers: this.defaultHeaders,
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as Channel;
+        return await res.clone().json() as Channel;
     }
 
     /**
@@ -144,10 +159,10 @@ class EasyPushClient {
             headers: this.defaultHeaders,
             body: JSON.stringify({ name }),
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as Channel;
+        return await res.clone().json() as Channel;
     }
 
     /**
@@ -160,10 +175,10 @@ class EasyPushClient {
             method: 'DELETE',
             headers: this.defaultHeaders,
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json();
+        return await res.clone().json();
     }
 
     /**
@@ -179,10 +194,10 @@ class EasyPushClient {
             headers: this.defaultHeaders,
             body: JSON.stringify({ identifier, payload, channel_id }),
         });
-        if (res.status !== 200) {
-            throw new Error(await res.text());
+        if (res.status !== 201) {
+            throw new Error(await res.clone().text());
         }
-        return await res.json() as Event | Channel;
+        return await res.clone().json() as Event | Channel;
     }
 
     /**
